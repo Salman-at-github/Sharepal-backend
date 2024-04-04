@@ -33,4 +33,19 @@ const fetchAllOrders = async (page = 1, limit = 1) => {
     }
 };
 
-module.exports = { fetchAllOrders };
+const fetchSingleOrder = async (orderID) => {
+    try {
+        const order = await OrderModel.findOne({ order_id: orderID });
+        if (!order) {
+            throw new Error('Order not found'); // Throw an error instead of returning a response
+        }
+        return {
+            data: order,
+        };
+    } catch (error) {
+        throw error;
+    }
+};
+
+
+module.exports = { fetchAllOrders, fetchSingleOrder };

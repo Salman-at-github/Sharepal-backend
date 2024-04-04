@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
-const TicketModel = require('./TicketModel');
+
+// Define the order types and associated stages
+const orderTypeStages = {
+    normal: ["Received", "Confirmed", "Shipped", "Delivered"],
+    cancelled: ["Received", "Confirmed", "Cancelled"],
+    return: ["Pickup Due", "Pickup Scheduled", "Quality Checked", "Order Completed"]
+};
 
 const orderSchema = new mongoose.Schema({
     order_id: {
@@ -22,7 +28,16 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    stage: {
+    order_type: {
+        type: String,
+        enum: ['normal', 'cancelled', 'return'], // Define possible order types
+        required: true
+    },
+    stages: {
+        type: [String],
+        required: true
+    },
+    current_stage: {
         type: String,
         required: true
     },
@@ -59,8 +74,16 @@ const orderSchema = new mongoose.Schema({
             required: true
         },
         image: String
-    }],
-    tickets: [TicketModel.schema]
+    }]
+});
+
+// Pre-save hook to set default stages based on order type
+orderSchema.pre('save', function(next) {
+    if (this.isNew) {
+        this.stages = orderTypeStages[this.order_type] || [];
+        this.current_stage = this.stages[0] || '';
+    }
+    next();
 });
 
 const OrderModel = mongoose.model('Order', orderSchema);

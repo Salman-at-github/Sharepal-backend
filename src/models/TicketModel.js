@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 
 const ticketSchema = new mongoose.Schema({
-    // Define fields for the Ticket model
-    // For example: description, status, etc.
     description: {
         type: String,
         required: true
@@ -12,7 +10,11 @@ const ticketSchema = new mongoose.Schema({
         enum: ['Open', 'In Progress', 'Resolved'],
         default: 'Open'
     },
-    // Any other fields relevant to your ticket
+    // Add a reference to the OrderModel
+    order: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order' // Reference to the OrderModel
+    }
 });
 
 const TicketModel = mongoose.model('Ticket', ticketSchema);
