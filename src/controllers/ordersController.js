@@ -22,11 +22,5 @@ const getSingleOrder = async(req, res)=>{
     }
 }
 
-const getVal = async(req, res)=>{
-    const orders = await OrderModel.find()
-    const stages = orders.map((order)=> order.stage)
-    res.status(200).json(stages)
 
-}
-
-module.exports = { getAllOrders, getSingleOrder, getVal };
+module.exports = { getAllOrders, getSingleOrder };

@@ -7,6 +7,17 @@ const orderTypeStages = {
     return: ["Pickup Due", "Pickup Scheduled", "Quality Checked", "Order Completed"]
 };
 
+const stageSchema = new mongoose.Schema({
+    stage: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    }
+});
+
 const orderSchema = new mongoose.Schema({
     order_id: {
         type: String,
@@ -34,8 +45,8 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
     stages: {
-        type: [String],
-        required: true
+        type: [stageSchema], // Array of stage objects
+        default: []
     },
     current_stage: {
         type: String,
@@ -80,8 +91,8 @@ const orderSchema = new mongoose.Schema({
 // Pre-save hook to set default stages based on order type
 orderSchema.pre('save', function(next) {
     if (this.isNew) {
-        this.stages = orderTypeStages[this.order_type] || [];
-        this.current_stage = this.stages[0] || '';
+        this.stages = orderTypeStages[this.order_type].map(stage => ({ stage, date: this.order_date })) || [];
+        this.current_stage = this.stages[0].stage || '';
     }
     next();
 });
